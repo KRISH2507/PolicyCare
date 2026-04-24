@@ -3,7 +3,8 @@ import logging
 import re
 import traceback
 
-import google.generativeai as genai
+from google import genai as google_genai
+from google.genai import types as genai_types
 
 from app.core.config import settings
 from app.services.vector_service import search_policy_chunks
@@ -12,14 +13,11 @@ from app.ai.prompts import RECOMMENDATION_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 
-genai.configure(api_key=settings.GEMINI_API_KEY)
+_client = google_genai.Client(api_key=settings.GEMINI_API_KEY)
 
-_model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
-    generation_config=genai.GenerationConfig(
-        temperature=0.1,
-        response_mime_type="application/json",
-    ),
+_GENERATION_CONFIG = genai_types.GenerateContentConfig(
+    temperature=0.1,
+    response_mime_type="application/json",
     system_instruction=RECOMMENDATION_SYSTEM_PROMPT,
 )
 
@@ -80,15 +78,15 @@ def _build_context(profile: RecommendationRequest, chunks: list) -> str:
 
 def _parse_gemini_response(response) -> dict:
     """Safely extract and parse JSON from a Gemini response object."""
-    # Check for blocked / empty response
     if not response or not response.candidates:
         logger.warning("[recommend] Gemini response has no candidates — using fallback.")
         return None
 
     candidate = response.candidates[0]
     finish_reason = getattr(candidate, "finish_reason", None)
-    # finish_reason 3 == SAFETY block in the Gemini SDK
-    if finish_reason == 3:
+    # New SDK uses string enum e.g. "SAFETY"; old SDK used int 3
+    finish_reason_str = str(finish_reason).upper() if finish_reason else ""
+    if "SAFETY" in finish_reason_str or finish_reason == 3:
         logger.warning("[recommend] Gemini response blocked by safety filter — using fallback.")
         return None
 
@@ -96,7 +94,7 @@ def _parse_gemini_response(response) -> dict:
     try:
         raw_text = response.text
     except Exception:
-        logger.warning("[recommend] response.text raised — using fallback.")
+        logger.warning("[recommend] response.text raised an exception — using fallback.")
         return None
 
     if not raw_text or not raw_text.strip():
@@ -139,12 +137,16 @@ def generate_recommendation(profile: RecommendationRequest) -> dict:
 
     try:
         context = _build_context(profile, chunks)
-        response = _model.generate_content(context)
+        response = _client.models.generate_content(
+            model="gemini-1.5-flash",
+            config=_GENERATION_CONFIG,
+            contents=context,
+        )
         logger.info("[recommend] Gemini response received.")
 
         parsed = _parse_gemini_response(response)
         if parsed is None:
-            logger.warning("[recommend] Falling back to fallback response due to unparseable Gemini output.")
+            logger.warning("[recommend] Unparseable Gemini output — using fallback.")
             return _FALLBACK_RESPONSE
 
         return parsed
