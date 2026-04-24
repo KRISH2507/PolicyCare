@@ -144,12 +144,34 @@ const ResultsPage = () => {
         </button>
 
         {!hasResult ? (
-          /* Empty state — no policies in DB yet */
+          /* Empty / fallback state */
           <div className="rec-empty">
-            <p style={{ fontWeight: 600, marginBottom: '8px', color: '#1A1A1A' }}>
-              No matching plans found
-            </p>
-            <p>{why_this_policy}</p>
+            {why_this_policy?.toLowerCase().includes("unable to generate") ||
+            why_this_policy?.toLowerCase().includes("please try again") ? (
+              <>
+                <p style={{ fontWeight: 600, marginBottom: '8px', color: '#1A1A1A' }}>
+                  Recommendation temporarily unavailable
+                </p>
+                <p>
+                  We couldn&apos;t generate a personalized recommendation right now, but your
+                  profile has been saved. Please try again in a moment.
+                </p>
+                <button
+                  className="rec-back-btn"
+                  style={{ marginTop: '16px' }}
+                  onClick={() => navigate('/profile')}
+                >
+                  ← Try again
+                </button>
+              </>
+            ) : (
+              <>
+                <p style={{ fontWeight: 600, marginBottom: '8px', color: '#1A1A1A' }}>
+                  No matching plans found
+                </p>
+                <p>{why_this_policy}</p>
+              </>
+            )}
           </div>
         ) : (
           <>

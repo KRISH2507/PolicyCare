@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import traceback
 
 import google.generativeai as genai
 
@@ -14,13 +15,24 @@ logger = logging.getLogger(__name__)
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 _model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
+    model_name="gemini-1.5-flash",
     generation_config=genai.GenerationConfig(
         temperature=0.1,
         response_mime_type="application/json",
     ),
     system_instruction=RECOMMENDATION_SYSTEM_PROMPT,
 )
+
+_FALLBACK_RESPONSE = {
+    "best_fit": None,
+    "peer_comparison": [],
+    "coverage_detail": None,
+    "why_this_policy": (
+        "Unable to generate a personalized recommendation right now. "
+        "Your profile has been saved. Please try again in a moment."
+    ),
+    "citations": [],
+}
 
 
 def build_query(profile: RecommendationRequest) -> str:
@@ -66,10 +78,54 @@ def _build_context(profile: RecommendationRequest, chunks: list) -> str:
     )
 
 
+def _parse_gemini_response(response) -> dict:
+    """Safely extract and parse JSON from a Gemini response object."""
+    # Check for blocked / empty response
+    if not response or not response.candidates:
+        logger.warning("[recommend] Gemini response has no candidates — using fallback.")
+        return None
+
+    candidate = response.candidates[0]
+    finish_reason = getattr(candidate, "finish_reason", None)
+    # finish_reason 3 == SAFETY block in the Gemini SDK
+    if finish_reason == 3:
+        logger.warning("[recommend] Gemini response blocked by safety filter — using fallback.")
+        return None
+
+    raw_text = None
+    try:
+        raw_text = response.text
+    except Exception:
+        logger.warning("[recommend] response.text raised — using fallback.")
+        return None
+
+    if not raw_text or not raw_text.strip():
+        logger.warning("[recommend] Gemini returned empty text — using fallback.")
+        return None
+
+    # Strip markdown code fences if present
+    cleaned = raw_text.strip()
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+    cleaned = cleaned.strip()
+
+    try:
+        parsed = json.loads(cleaned)
+        logger.info("[recommend] Gemini JSON parsed successfully.")
+        return parsed
+    except json.JSONDecodeError as e:
+        logger.error("[recommend] JSON parse failed: %s | raw snippet: %.300s", e, cleaned)
+        return None
+
+
 def generate_recommendation(profile: RecommendationRequest) -> dict:
+    logger.info("[recommend] Request started for user: %s", profile.full_name)
+
     chunks = search_policy_chunks(query=build_query(profile), top_k=15)
+    logger.info("[recommend] Vector search complete — %d chunks retrieved.", len(chunks) if chunks else 0)
 
     if not chunks:
+        logger.warning("[recommend] No chunks found in vector store — returning empty policy fallback.")
         return {
             "best_fit": None,
             "peer_comparison": [],
@@ -82,12 +138,18 @@ def generate_recommendation(profile: RecommendationRequest) -> dict:
         }
 
     try:
-        response = _model.generate_content(_build_context(profile, chunks))
-        raw = re.sub(r"^```(?:json)?\s*", "", response.text.strip())
-        raw = re.sub(r"\s*```$", "", raw)
-        return json.loads(raw)
-    except json.JSONDecodeError as e:
-        logger.error("Recommendation JSON parse failed: %s", e)
-        raise ValueError(f"Gemini returned invalid JSON: {e}")
+        context = _build_context(profile, chunks)
+        response = _model.generate_content(context)
+        logger.info("[recommend] Gemini response received.")
+
+        parsed = _parse_gemini_response(response)
+        if parsed is None:
+            logger.warning("[recommend] Falling back to fallback response due to unparseable Gemini output.")
+            return _FALLBACK_RESPONSE
+
+        return parsed
+
     except Exception as e:
-        raise ValueError(f"Gemini Recommendation Failed: {e}")
+        logger.error("[recommend] Gemini call failed: %s\n%s", e, traceback.format_exc())
+        logger.warning("[recommend] Using fallback response.")
+        return _FALLBACK_RESPONSE
