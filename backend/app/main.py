@@ -1,5 +1,10 @@
+import os
+os.environ["ANONYMIZED_TELEMETRY"] = "false"
+os.environ["CHROMA_TELEMETRY"] = "false"
+
 import logging
 import time
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -270,7 +275,7 @@ def _auto_seed():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
-    _auto_seed()
+    asyncio.create_task(asyncio.to_thread(_auto_seed))
     yield
 
 
@@ -289,12 +294,12 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
+@app.get("/health", tags=["Health"])
+def health_check():
+    return {"status": "ok", "service": "aarogyaaid-backend"}
+
+
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(recommend.router, prefix="/api/recommend", tags=["Recommendations"])
 app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Administration"])
-
-
-@app.get("/health", tags=["Health"])
-def health_check():
-    return {"status": "ok", "service": "aarogyaaid-backend"}
