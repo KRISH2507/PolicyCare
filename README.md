@@ -2,6 +2,103 @@
 
 An AI-powered health insurance recommendation platform that matches Indian users to the right policy based on their health profile, then lets them ask follow-up questions about it in plain language.
 
+> **Demo:** [Add your Loom/video link here]  
+> **Live:** Not deployed (local setup — see Quick Start below)
+
+---
+
+## Quick Start
+
+```bash
+# 1. Clone
+git clone <your-repo-url>
+cd aarogyaaid
+
+# 2. Backend
+cd backend
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # macOS/Linux
+pip install -r requirements.txt
+cp .env.example .env           # fill in OPENAI_API_KEY and JWT_SECRET
+uvicorn app.main:app --reload --port 8000
+
+# 3. Frontend (new terminal)
+cd frontend
+npm install
+npm run dev
+# → http://localhost:5173
+
+# 4. Upload sample policies
+# Log in as admin → Admin dashboard → upload files from sample-data/
+
+# 5. Run tests
+cd backend
+pytest tests/test_recommendation.py -v
+```
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        React Frontend                        │
+│  Landing → Login/Signup → Profile Form → Results + Chat     │
+│                        Admin Dashboard                       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ fetch + Bearer JWT
+┌──────────────────────────▼──────────────────────────────────┐
+│                      FastAPI Backend                         │
+│  /api/auth    /api/recommend    /api/chat    /api/admin      │
+└──────┬──────────────┬──────────────┬──────────────┬─────────┘
+       │              │              │              │
+  SQLite DB      ChromaDB       OpenAI API     File System
+  (users,        (policy        (gpt-4o-mini   (uploaded
+   policies)      vectors)       embeddings)    documents)
+```
+
+**RAG Pipeline (on upload):**
+```
+PDF/TXT/JSON → PyMuPDF parse → sliding window chunks (300w, 50w overlap)
+             → text-embedding-3-small → ChromaDB cosine store
+```
+
+**RAG Pipeline (on query):**
+```
+User profile → weighted query string → embed → ChromaDB top-K retrieve
+             → GPT-4o-mini + system prompt + retrieved context → JSON response
+```
+
+---
+
+## API Reference
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | `/api/auth/login` | None | Login or auto-register |
+| POST | `/api/recommend/` | User JWT | Get policy recommendation |
+| POST | `/api/chat/` | User JWT | Chat about recommended policy |
+| GET | `/api/admin/policies` | Admin JWT | List all policies |
+| POST | `/api/admin/upload` | Admin JWT | Upload + vectorise policy |
+| PATCH | `/api/admin/policies/{id}` | Admin JWT | Edit policy metadata |
+| DELETE | `/api/admin/policies/{id}` | Admin JWT | Delete policy + vectors |
+| GET | `/health` | None | Health check |
+
+Full interactive docs: http://localhost:8000/docs
+
+---
+
+## What Makes This Different
+
+Most AI assignment projects call an LLM with a hardcoded prompt and return whatever it says. AarogyaAid does three things that are harder to fake:
+
+1. **Grounded output** — the LLM can only cite facts present in the uploaded documents. The system prompt explicitly forbids stating anything not in the retrieved context. Every factual claim in the response includes a source citation.
+
+2. **Per-policy chat filtering** — the chat RAG retrieval uses a ChromaDB `where` clause to filter results to the recommended policy only. The user gets answers about their specific plan, not generic insurance information.
+
+3. **Admin-driven knowledge base** — the recommendation quality improves as admins upload more policies. No code changes, no redeployment. This is the architecture that makes the product maintainable in production.
+
 ---
 
 ## Features
