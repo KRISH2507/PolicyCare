@@ -23,7 +23,7 @@ _model = genai.GenerativeModel(
 )
 
 
-def _build_query(profile: RecommendationRequest) -> str:
+def build_query(profile: RecommendationRequest) -> str:
     conditions = ", ".join(profile.pre_existing_conditions) if profile.pre_existing_conditions else "none"
     return (
         f"health insurance policy premium coverage amount inclusions exclusions "
@@ -31,6 +31,10 @@ def _build_query(profile: RecommendationRequest) -> str:
         f"income {profile.income_band} city {profile.city_tier} "
         f"lifestyle {profile.lifestyle} age {profile.age}"
     )
+
+
+# alias kept for tests
+generate_query_from_profile = build_query
 
 
 def _build_context(profile: RecommendationRequest, chunks: list) -> str:
@@ -63,7 +67,7 @@ def _build_context(profile: RecommendationRequest, chunks: list) -> str:
 
 
 def generate_recommendation(profile: RecommendationRequest) -> dict:
-    chunks = search_policy_chunks(query=_build_query(profile), top_k=15)
+    chunks = search_policy_chunks(query=build_query(profile), top_k=15)
 
     if not chunks:
         return {
