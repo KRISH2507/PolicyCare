@@ -11,7 +11,12 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str
     GOOGLE_CLIENT_ID: str = ""
     CHROMA_PATH: str = "./chroma_db"
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:5173"]
+
+    ALLOWED_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://policy-care.vercel.app",
+    ]
 
     model_config = SettingsConfigDict(
         env_file=".env",
