@@ -3,8 +3,7 @@ import logging
 import re
 import traceback
 
-from google import genai as google_genai
-from google.genai import types as genai_types
+import google.generativeai as genai
 
 from app.core.config import settings
 from app.services.vector_service import search_policy_chunks
@@ -13,11 +12,14 @@ from app.ai.prompts import RECOMMENDATION_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 
-_client = google_genai.Client(api_key=settings.GEMINI_API_KEY)
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
-_GENERATION_CONFIG = genai_types.GenerateContentConfig(
-    temperature=0.1,
-    response_mime_type="application/json",
+_model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    generation_config=genai.GenerationConfig(
+        temperature=0.1,
+        response_mime_type="application/json",
+    ),
     system_instruction=RECOMMENDATION_SYSTEM_PROMPT,
 )
 
@@ -84,9 +86,9 @@ def _parse_gemini_response(response) -> dict:
 
     candidate = response.candidates[0]
     finish_reason = getattr(candidate, "finish_reason", None)
-    # New SDK uses string enum e.g. "SAFETY"; old SDK used int 3
-    finish_reason_str = str(finish_reason).upper() if finish_reason else ""
-    if "SAFETY" in finish_reason_str or finish_reason == 3:
+    
+    # Old SDK uses integer enum for STOP/SAFETY, where 3 = SAFETY
+    if finish_reason == 3:
         logger.warning("[recommend] Gemini response blocked by safety filter — using fallback.")
         return None
 
@@ -137,11 +139,7 @@ def generate_recommendation(profile: RecommendationRequest) -> dict:
 
     try:
         context = _build_context(profile, chunks)
-        response = _client.models.generate_content(
-            model="gemini-1.5-flash",
-            config=_GENERATION_CONFIG,
-            contents=context,
-        )
+        response = _model.generate_content(context)
         logger.info("[recommend] Gemini response received.")
 
         parsed = _parse_gemini_response(response)
