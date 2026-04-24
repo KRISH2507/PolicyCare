@@ -1,102 +1,89 @@
 import json
-from openai import OpenAI
+import logging
+import re
+
+import google.generativeai as genai
+
 from app.core.config import settings
 from app.services.vector_service import search_policy_chunks
 from app.schemas.recommend import RecommendationRequest
 from app.ai.prompts import RECOMMENDATION_SYSTEM_PROMPT
 
-openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+logger = logging.getLogger(__name__)
 
-def generate_query_from_profile(profile: RecommendationRequest) -> str:
-    """Converts the user profile into an optimized fuzzy search query."""
-    conditions = " ".join(profile.pre_existing_conditions) if profile.pre_existing_conditions else "healthy no pre-existing conditions"
-    
-    query = (
-        f"health insurance policy details for {profile.age} year old in {profile.city_tier} city with "
-        f"{conditions} conditions, {profile.lifestyle} lifestyle, income {profile.income_band}."
+genai.configure(api_key=settings.GEMINI_API_KEY)
+
+_model = genai.GenerativeModel(
+    model_name="gemini-2.5-flash",
+    generation_config=genai.GenerationConfig(
+        temperature=0.1,
+        response_mime_type="application/json",
+    ),
+    system_instruction=RECOMMENDATION_SYSTEM_PROMPT,
+)
+
+
+def _build_query(profile: RecommendationRequest) -> str:
+    conditions = ", ".join(profile.pre_existing_conditions) if profile.pre_existing_conditions else "none"
+    return (
+        f"health insurance policy premium coverage amount inclusions exclusions "
+        f"waiting period for {conditions} "
+        f"income {profile.income_band} city {profile.city_tier} "
+        f"lifestyle {profile.lifestyle} age {profile.age}"
     )
-    
-    # Priority logic appending for vector weighting
-    if profile.pre_existing_conditions:
-         query += " focus on waiting periods for pre-existing diseases."
-    if profile.income_band in ["under 3L", "3-8L"]:
-         query += " focus on affordability, low premiums, and value coverage."
-    if profile.lifestyle in ["Active", "Athlete"]:
-         query += " focus on OPD, sports injuries, and wellness benefits."
-         
-    return query
+
+
+def _build_context(profile: RecommendationRequest, chunks: list) -> str:
+    chunk_text = ""
+    for i, chunk in enumerate(chunks):
+        meta = chunk["metadata"]
+        section = meta.get("section", meta.get("page_number", "unknown"))
+        chunk_text += (
+            f"\n\n--- CHUNK {i+1} "
+            f"| Policy: {meta.get('policy_name', 'Unknown')} "
+            f"| Insurer: {meta.get('insurer', 'Unknown')} "
+            f"| Section: {section} ---\n"
+            f"{chunk['document']}"
+        )
+
+    conditions_str = ", ".join(profile.pre_existing_conditions) if profile.pre_existing_conditions else "None"
+
+    return (
+        f"USER PROFILE:\n"
+        f"Name: {profile.full_name}\n"
+        f"Age: {profile.age}\n"
+        f"City Tier: {profile.city_tier}\n"
+        f"Lifestyle: {profile.lifestyle}\n"
+        f"Pre-existing Conditions: {conditions_str}\n"
+        f"Annual Income Band: {profile.income_band}\n\n"
+        f"RETRIEVED POLICY CHUNKS:\n{chunk_text}\n\n"
+        f"Return the recommendation JSON. Extract premium and coverage amounts from "
+        f"lines starting with 'Annual Premium:' and 'Coverage Amount:' in the PREMIUM chunks."
+    )
+
 
 def generate_recommendation(profile: RecommendationRequest) -> dict:
-    
-    # 1. Convert user profile into retrieval query
-    query = generate_query_from_profile(profile)
-    
-    # 2. Retrieve chunks across previously uploaded admin policies
-    retrieved_chunks = search_policy_chunks(query=query, top_k=10)
-    
-    # Graceful fallback if ChromaDB is barren
-    if not retrieved_chunks:
+    chunks = search_policy_chunks(query=_build_query(profile), top_k=15)
+
+    if not chunks:
         return {
             "best_fit": None,
             "peer_comparison": [],
             "coverage_detail": None,
             "why_this_policy": (
-                f"Hello {profile.full_name}, I understand you are living in a {profile.city_tier} area with "
-                f"a {profile.lifestyle.lower()} lifestyle. Unfortunately, our current database does not contain "
-                f"policies matching your specific needs. Please check back after your admin adds more plans!"
+                f"Hello {profile.full_name}, unfortunately our database does not contain "
+                f"policies matching your needs yet. Please ask an admin to upload policy documents."
             ),
-            "citations": []
+            "citations": [],
         }
 
-    # 3. Group chunks by policy and Format explicit real context strings enforcing AI grounding
-    # Grouping logic groups multiple chunks related to the same policy gracefully
-    grouped_policies = {}
-    for chunk in retrieved_chunks:
-        meta = chunk["metadata"]
-        policy_slug = f"{meta.get('policy_name', 'Unknown')} ({meta.get('insurer', 'Unknown')})"
-        
-        if policy_slug not in grouped_policies:
-            grouped_policies[policy_slug] = []
-        
-        doc_text = chunk["document"]
-        page_num = meta.get('page_number', '?')
-        grouped_policies[policy_slug].append(f"[Page {page_num}]: {doc_text}")
-
-    context_text = "RETRIEVED POLICY DOCUMENTS:\n\n"
-    for policy, blocks in grouped_policies.items():
-        context_text += f"--- Policy: {policy} ---\n"
-        for b in blocks:
-            context_text += f"{b}\n"
-        context_text += "\n"
-
-    user_prompt = f"""
-USER PROFILE:
-Full Name: {profile.full_name}
-Age: {profile.age}
-City Tier: {profile.city_tier}
-Lifestyle: {profile.lifestyle}
-Pre-existing Conditions: {', '.join(profile.pre_existing_conditions) if profile.pre_existing_conditions else 'None'}
-Income Band: {profile.income_band}
-
-Based on the rules and retrieved documents provided above, please return the JSON recommendation evaluating which policy is the best match.
-"""
-    
-    # 4. Call OpenAI API explicitly forcing structural schema
     try:
-        response = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": RECOMMENDATION_SYSTEM_PROMPT},
-                {"role": "system", "content": context_text},
-                {"role": "user", "content": user_prompt}
-            ],
-            response_format={ "type": "json_object" },
-            temperature=0.2
-        )
-        
-        # 5. Parse out safely
-        raw_content = response.choices[0].message.content
-        return json.loads(raw_content)
-        
+        response = _model.generate_content(_build_context(profile, chunks))
+        raw = re.sub(r"^```(?:json)?\s*", "", response.text.strip())
+        raw = re.sub(r"\s*```$", "", raw)
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        logger.error("Recommendation JSON parse failed: %s", e)
+        raise ValueError(f"Gemini returned invalid JSON: {e}")
     except Exception as e:
-        raise ValueError(f"OpenAI Generation Failed: {str(e)}")
+        raise ValueError(f"Gemini Recommendation Failed: {e}")

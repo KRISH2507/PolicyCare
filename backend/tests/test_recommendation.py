@@ -166,23 +166,21 @@ class TestQueryGeneration:
 class TestGenerateRecommendation:
     """Tests for generate_recommendation — mocks ChromaDB and OpenAI."""
 
-    def _make_openai_mock(self, content: str):
-        """Helper: build a mock that looks like an openai ChatCompletion response."""
-        mock_choice = MagicMock()
-        mock_choice.message.content = content
+    def _make_gemini_mock(self, content: str):
+        """Helper: build a mock that looks like a Gemini GenerateContentResponse."""
         mock_response = MagicMock()
-        mock_response.choices = [mock_choice]
+        mock_response.text = content
         return mock_response
 
     @patch("app.ai.recommend_engine.search_policy_chunks")
-    @patch("app.ai.recommend_engine.openai_client")
+    @patch("app.ai.recommend_engine._model")
     def test_response_has_required_top_level_keys(
-        self, mock_client, mock_search, sample_profile,
+        self, mock_model, mock_search, sample_profile,
         mock_chunks, mock_openai_recommendation_response
     ):
         """The response dict must contain all keys defined in RecommendationResponse."""
         mock_search.return_value = mock_chunks
-        mock_client.chat.completions.create.return_value = self._make_openai_mock(
+        mock_model.generate_content.return_value = self._make_gemini_mock(
             mock_openai_recommendation_response
         )
 
@@ -196,14 +194,14 @@ class TestGenerateRecommendation:
         )
 
     @patch("app.ai.recommend_engine.search_policy_chunks")
-    @patch("app.ai.recommend_engine.openai_client")
+    @patch("app.ai.recommend_engine._model")
     def test_why_this_policy_is_non_empty_string(
-        self, mock_client, mock_search, sample_profile,
+        self, mock_model, mock_search, sample_profile,
         mock_chunks, mock_openai_recommendation_response
     ):
         """why_this_policy must be a non-empty string."""
         mock_search.return_value = mock_chunks
-        mock_client.chat.completions.create.return_value = self._make_openai_mock(
+        mock_model.generate_content.return_value = self._make_gemini_mock(
             mock_openai_recommendation_response
         )
 
@@ -214,14 +212,14 @@ class TestGenerateRecommendation:
         assert len(result["why_this_policy"].strip()) > 0
 
     @patch("app.ai.recommend_engine.search_policy_chunks")
-    @patch("app.ai.recommend_engine.openai_client")
+    @patch("app.ai.recommend_engine._model")
     def test_peer_comparison_is_list(
-        self, mock_client, mock_search, sample_profile,
+        self, mock_model, mock_search, sample_profile,
         mock_chunks, mock_openai_recommendation_response
     ):
         """peer_comparison must be a list (can be empty)."""
         mock_search.return_value = mock_chunks
-        mock_client.chat.completions.create.return_value = self._make_openai_mock(
+        mock_model.generate_content.return_value = self._make_gemini_mock(
             mock_openai_recommendation_response
         )
 
@@ -231,14 +229,14 @@ class TestGenerateRecommendation:
         assert isinstance(result["peer_comparison"], list)
 
     @patch("app.ai.recommend_engine.search_policy_chunks")
-    @patch("app.ai.recommend_engine.openai_client")
+    @patch("app.ai.recommend_engine._model")
     def test_best_fit_has_required_fields(
-        self, mock_client, mock_search, sample_profile,
+        self, mock_model, mock_search, sample_profile,
         mock_chunks, mock_openai_recommendation_response
     ):
         """best_fit must contain policy_name, insurer, premium, cover_amount."""
         mock_search.return_value = mock_chunks
-        mock_client.chat.completions.create.return_value = self._make_openai_mock(
+        mock_model.generate_content.return_value = self._make_gemini_mock(
             mock_openai_recommendation_response
         )
 
@@ -252,9 +250,8 @@ class TestGenerateRecommendation:
 
     @patch("app.ai.recommend_engine.search_policy_chunks")
     def test_empty_chroma_returns_graceful_fallback(self, mock_search, sample_profile):
-        """When ChromaDB returns no chunks, the engine must return a graceful fallback
-        with why_this_policy set and best_fit as None — no exception raised."""
-        mock_search.return_value = []  # empty vector store
+        """When ChromaDB returns no chunks, the engine must return a graceful fallback."""
+        mock_search.return_value = []
 
         from app.ai.recommend_engine import generate_recommendation
         result = generate_recommendation(sample_profile)
@@ -266,14 +263,14 @@ class TestGenerateRecommendation:
         assert result["citations"] == []
 
     @patch("app.ai.recommend_engine.search_policy_chunks")
-    @patch("app.ai.recommend_engine.openai_client")
+    @patch("app.ai.recommend_engine._model")
     def test_citations_is_list(
-        self, mock_client, mock_search, sample_profile,
+        self, mock_model, mock_search, sample_profile,
         mock_chunks, mock_openai_recommendation_response
     ):
         """citations must be a list."""
         mock_search.return_value = mock_chunks
-        mock_client.chat.completions.create.return_value = self._make_openai_mock(
+        mock_model.generate_content.return_value = self._make_gemini_mock(
             mock_openai_recommendation_response
         )
 
@@ -283,16 +280,16 @@ class TestGenerateRecommendation:
         assert isinstance(result["citations"], list)
 
     @patch("app.ai.recommend_engine.search_policy_chunks")
-    @patch("app.ai.recommend_engine.openai_client")
-    def test_openai_failure_raises_value_error(
-        self, mock_client, mock_search, sample_profile, mock_chunks
+    @patch("app.ai.recommend_engine._model")
+    def test_gemini_failure_raises_value_error(
+        self, mock_model, mock_search, sample_profile, mock_chunks
     ):
-        """If OpenAI throws, generate_recommendation must raise ValueError."""
+        """If Gemini throws, generate_recommendation must raise ValueError."""
         mock_search.return_value = mock_chunks
-        mock_client.chat.completions.create.side_effect = Exception("API timeout")
+        mock_model.generate_content.side_effect = Exception("API timeout")
 
         from app.ai.recommend_engine import generate_recommendation
-        with pytest.raises(ValueError, match="OpenAI Generation Failed"):
+        with pytest.raises(ValueError, match="Gemini Recommendation Failed"):
             generate_recommendation(sample_profile)
 
 

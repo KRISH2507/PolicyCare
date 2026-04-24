@@ -1,89 +1,98 @@
 import json
-from openai import OpenAI
+import logging
+import re
+
+import google.generativeai as genai
+
 from app.core.config import settings
 from app.services.vector_service import search_policy_chunks
 from app.schemas.chat import ChatRequest
 
-# Initialize persistent OpenAI Text Embedding client 
-openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+logger = logging.getLogger(__name__)
 
-CHAT_SYSTEM_PROMPT = """You are AarogyaAid, an empathetic Indian health insurance advisor answering follow-up questions about a recommended policy.
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
-CRITICAL RULES:
-1. SAFE SCOPE: NEVER diagnose symptoms, prescribe medicine, or recommend surgeries. If a user asks "Should I get surgery?" or "Diagnose my symptoms", politely decline and redirect to insurance coverage limits and procedures.
-2. TONE: Be warm, respectful, and use plain English. Define jargon (like co-pay, waiting period, sub-limits) the first time you use it.
-3. GROUNDING & HALLUCINATION: Only use the retrieved policy documents provided. If the information is missing from the uploaded documents, explicitly state: "This information is unavailable in the uploaded documents."
-4. LENGTH: Keep answers concise (max ~180 words) unless a detailed comparison is requested.
-5. CONTEXT: Read the user's profile and chat history to provide personalized, realistic examples based on their condition, lifestyle, and city tier. Do not ask for profile fields you already have.
-6. CITATIONS: Always cite the actual filename and page number when quoting factual policy details.
+_SYSTEM_PROMPT = """You are a health insurance explainer for AarogyaAid. You help users understand their recommended health insurance policy.
 
-Output strictly as a JSON object:
+You will receive:
+1. The user's profile (name, age, conditions, city, lifestyle, income)
+2. The recommended policy name
+3. POLICY CONTEXT: retrieved chunks from the actual policy document
+4. The conversation history
+
+RULES:
+- Answer ONLY from the POLICY CONTEXT. If the answer is there, give it clearly. Never say "no information available" if the context contains relevant text.
+- For premium or coverage questions, look for lines starting with "Annual Premium:" and "Coverage Amount:" in the context.
+- End every factual answer with: "— Source: [policy_name, section]"
+- If the context genuinely lacks the answer: "The policy document doesn't cover that detail. Contact the insurer directly."
+- For medical questions: "I can only help with insurance coverage questions — I'm not able to give medical advice."
+- Use the user's name in your first response. Never ask for profile fields you already have.
+- When explaining jargon, define it plainly first, then apply it to the user's situation.
+- Plain conversational text only. No markdown.
+
+Output as JSON:
 {
-  "reply": "Your conversational answer here...",
-  "citations": ["Document Name (Page X)"],
+  "reply": "...",
+  "citations": ["Policy Name — Section Name"],
   "requires_followup": true/false
-}
-"""
+}"""
+
+_model = genai.GenerativeModel(
+    model_name="gemini-2.5-flash",
+    generation_config=genai.GenerationConfig(
+        temperature=0.2,
+        response_mime_type="application/json",
+    ),
+    system_instruction=_SYSTEM_PROMPT,
+)
+
 
 def generate_chat_reply(request: ChatRequest) -> dict:
-    
     profile = request.user_profile
-    conditions_list = profile.get("pre_existing_conditions", [])
-    conditions_str = " ".join(conditions_list) if conditions_list else "healthy"
-    
-    # B. Build a hyper-focused retrieval query weighing their actual profile context
+    conditions_str = " ".join(profile.get("pre_existing_conditions", [])) or "healthy"
+
     search_query = (
-        f"{request.message} {request.recommended_policy_name} "
-        f"{profile.get('city_tier', '')} {conditions_str}"
+        f"{request.message} policy premium coverage waiting period "
+        f"inclusions exclusions {request.recommended_policy_name} "
+        f"{conditions_str} {profile.get('city_tier', '')}"
     )
-    
-    # C. Search Chroma, strictly filtering to the recommended policy if provided
+
     policy_ids = [request.recommended_policy_id] if request.recommended_policy_id else None
-    retrieved_chunks = search_policy_chunks(query=search_query, top_k=7, policy_ids=policy_ids)
-    
-    # Build context block
-    context_text = "RETRIEVED POLICY DOCUMENTS:\n\n"
-    if not retrieved_chunks:
-        context_text += "No relevant documents found in the database. Rely strictly on graceful fallbacks.\n"
-    else:
-        for i, chunk in enumerate(retrieved_chunks):
-            meta = chunk["metadata"]
-            doc_text = chunk["document"]
-            context_text += f"---\nPolicy: {meta.get('policy_name', 'Unknown')} | Insurer: {meta.get('insurer', 'Unknown')} | Page: {meta.get('page_number', '?')}\nContent: {doc_text}\n"
+    chunks = search_policy_chunks(query=search_query, top_k=8, policy_ids=policy_ids)
 
-    # Provide Profile explicitly to the LLM memory block
-    profile_text = (
+    if not chunks:
+        context_block = "POLICY CONTEXT:\nNo relevant chunks found.\n"
+    else:
+        context_block = "POLICY CONTEXT:\n"
+        for i, chunk in enumerate(chunks):
+            meta = chunk["metadata"]
+            section = meta.get("section", f"Page {meta.get('page_number', '?')}")
+            context_block += (
+                f"\n--- CHUNK {i+1} | Policy: {meta.get('policy_name')} "
+                f"| Section: {section} ---\n{chunk['document']}\n"
+            )
+
+    history_text = ""
+    for msg in request.history[-6:]:
+        role = msg.get("role", "")
+        if role in ("user", "assistant"):
+            history_text += f"{role.capitalize()}: {msg.get('content', '')}\n"
+
+    prompt = (
         f"USER PROFILE:\n{json.dumps(profile, indent=2)}\n\n"
-        f"RECOMMENDED POLICY CONTEXT: {request.recommended_policy_name}"
+        f"RECOMMENDED POLICY: {request.recommended_policy_name}\n\n"
+        f"{context_block}\n"
+        f"CONVERSATION HISTORY:\n{history_text}\n"
+        f"User: {request.message}"
     )
 
-    # Initialize Chat History
-    messages = [
-        {"role": "system", "content": CHAT_SYSTEM_PROMPT},
-        {"role": "system", "content": profile_text},
-        {"role": "system", "content": context_text}
-    ]
-    
-    # D. Inject Previous Chat History dynamically
-    for msg in request.history[-6:]:  # Keep context window efficient (last 6 interactions)
-        role = msg.get("role")
-        if role in ["user", "assistant"]:
-            messages.append({"role": role, "content": msg.get("content", "")})
-            
-    # Inject current message payload
-    messages.append({"role": "user", "content": request.message})
-    
-    # E. Call OpenAI API explicitly forcing structural schema
     try:
-        response = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            response_format={"type": "json_object"},
-            temperature=0.2
-        )
-        
-        raw_content = response.choices[0].message.content
-        return json.loads(raw_content)
-        
+        response = _model.generate_content(prompt)
+        raw = re.sub(r"^```(?:json)?\s*", "", response.text.strip())
+        raw = re.sub(r"\s*```$", "", raw)
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        logger.error("Chat JSON parse failed: %s", e)
+        raise ValueError(f"Gemini Chat returned invalid JSON: {e}")
     except Exception as e:
-        raise ValueError(f"OpenAI Chat Generation Failed: {str(e)}")
+        raise ValueError(f"Gemini Chat Failed: {e}")

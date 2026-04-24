@@ -11,20 +11,10 @@ def process_chat(
     request: ChatRequest,
     current_user: dict = Depends(get_current_user),
 ):
-    """
-    Authenticated endpoint. Accepts a user message and conversation history,
-    retrieves relevant policy chunks via RAG, and returns a grounded reply.
-    """
     try:
-        result_dict = generate_chat_reply(request)
-        return ChatResponse(**result_dict)
-    except ValueError as ve:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(ve),
-        )
+        return ChatResponse(**generate_chat_reply(request))
+    except ValueError as e:
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Chat engine failed: {str(e)}",
-        )
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            f"Chat engine failed: {e}")

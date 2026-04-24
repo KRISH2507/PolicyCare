@@ -1,0 +1,59 @@
+POLICY DOCUMENT — CareShield Basic
+Insurer: NovaSure Health Insurance
+Policy Name: CareShield Basic
+
+OVERVIEW
+CareShield Basic is an entry-level individual health insurance plan designed for young, healthy individuals in Tier-2 and Tier-3 cities with limited budgets.
+
+PREMIUM
+Annual Premium: Rs 5,000 per year
+Coverage Amount: Rs 3,00,000 (3 Lakh)
+
+ELIGIBILITY
+Minimum Age: 18 years
+Maximum Age: 45 years
+Best suited for: Individuals under 35, sedentary or moderate lifestyle, no pre-existing conditions, annual income under Rs 3 Lakh, Tier-2 or Tier-3 cities
+
+INCLUSIONS
+- Inpatient hospitalisation (minimum 24 hours)
+- Pre-hospitalisation expenses up to 30 days
+- Post-hospitalisation expenses up to 60 days
+- Ambulance charges up to Rs 2,000 per hospitalisation
+- Day care procedures (listed 141 procedures)
+- Government hospital cashless facility
+
+EXCLUSIONS
+- Pre-existing diseases and their complications for the first 4 years
+- Diabetes and diabetes-related conditions for 4-year waiting period
+- Hypertension and blood pressure conditions for 4-year waiting period
+- Cardiac conditions for 4-year waiting period
+- Asthma for 4-year waiting period
+- Maternity and newborn expenses
+- Cosmetic or plastic surgery
+- Self-inflicted injuries
+- Dental treatment (unless due to accident)
+- OPD consultations and medicines
+
+WAITING PERIODS
+Initial waiting period: 30 days from policy start
+Pre-existing disease waiting period: 4 years
+Specific illness waiting period: 2 years
+
+SUB-LIMITS
+Room rent: Rs 1,000 per day (general ward)
+ICU charges: Rs 2,000 per day
+Doctor fees: Rs 500 per visit
+
+CO-PAY
+10% co-pay applicable for all claims
+20% co-pay if treated in a non-network hospital
+
+CLAIM TYPE
+Cashless: Available at 2,000+ network hospitals
+Reimbursement: Available for non-network hospitals
+
+SUITABILITY
+This plan is most suitable for young individuals aged 18-35 with no pre-existing conditions, living in Tier-2 or Tier-3 cities, earning under Rs 3 Lakh annually. Not recommended for anyone with diabetes, hypertension, cardiac conditions, or asthma due to the 4-year waiting period. The low premium makes it ideal for first-time insurance buyers on a tight budget.
+
+NETWORK HOSPITALS
+2,000+ hospitals across India, primarily in Tier-2 and Tier-3 cities

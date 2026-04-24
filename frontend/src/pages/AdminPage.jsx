@@ -34,9 +34,9 @@ const AdminPage = () => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {currentUser?.username && (
+          {currentUser?.email && (
             <span style={{ fontSize: '13px', color: '#8A8A8A' }}>
-              {currentUser.username}
+              {currentUser.full_name || currentUser.email}
             </span>
           )}
           <button

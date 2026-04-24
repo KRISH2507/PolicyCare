@@ -37,11 +37,9 @@ export const SessionProvider = ({ children }) => {
     } else {
       localStorage.removeItem('aarogyaaid_token');
       localStorage.removeItem('aarogyaaid_user');
-      // Clear session data on logout
       localStorage.removeItem('aarogyaaid_profile');
       localStorage.removeItem('aarogyaaid_result');
       localStorage.removeItem('aarogyaaid_chat_history');
-      // Reset in-memory state
       setUserProfileState(null);
       setRecommendationResultState(null);
       setConversationHistoryState([]);
