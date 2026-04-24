@@ -1,0 +1,162 @@
+/* ============================================================
+   ProfilePage.module.css — Profile / Recommendation form
+   ============================================================ */
+
+.container {
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 52px 24px 64px;
+}
+
+/* ── Page header ── */
+.title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: 40px;
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Form ── */
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Field ── */
+.field {
+  margin-bottom: 24px;
+}
+
+.field label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+
+.sublabel {
+  font-size: 12px;
+  color: var(--color-text-faint);
+  margin-bottom: 10px;
+  line-height: var(--leading-normal);
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field select {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: #FAFAF9;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  transition: border-color var(--transition), box-shadow var(--transition),
+              background var(--transition);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field input[type="text"]:focus,
+.field input[type="number"]:focus,
+.field select:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-primary-ring);
+}
+
+/* ── Checkbox grid ── */
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color var(--transition), background var(--transition);
+  user-select: none;
+}
+
+.checkboxWrapper:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-tint);
+}
+
+.checkboxWrapper input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ── Submit button ── */
+.submitBtn {
+  width: 100%;
+  height: 46px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background var(--transition), opacity var(--transition);
+  letter-spacing: 0.01em;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Error text ── */
+.errorText {
+  font-size: 12px;
+  color: var(--color-danger);
+  display: block;
+  margin-top: 5px;
+  line-height: var(--leading-normal);
+}
+
+/* ── Mobile ── */
+@media (max-width: 560px) {
+  .container {
+    padding: 32px 16px 48px;
+  }
+
+  .checkboxGrid {
+    grid-template-columns: 1fr;
+  }
+}

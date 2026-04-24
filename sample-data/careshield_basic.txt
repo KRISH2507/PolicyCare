@@ -1,0 +1,152 @@
+POLICY DOCUMENT
+===============
+Policy Name:   CareShield Basic
+Insurer:       SafeGuard General Insurance Co. Ltd.
+Policy Type:   Individual Health Insurance
+Document Ref:  SG-CSB-2024-v1
+
+---
+
+OVERVIEW
+--------
+CareShield Basic is an entry-level individual health insurance plan designed for
+first-time buyers and low-income households seeking essential hospitalisation cover
+at an affordable annual premium. It provides straightforward inpatient coverage
+without complex riders or add-ons.
+
+---
+
+PREMIUM & COVER
+---------------
+Annual Premium:    ₹6,500 (age 18–35) | ₹9,200 (age 36–50) | ₹14,800 (age 51–60)
+Sum Insured:       ₹3,00,000 (Three Lakh Rupees)
+Policy Term:       1 year, renewable annually
+Grace Period:      30 days from renewal due date
+
+---
+
+ELIGIBILITY
+-----------
+Minimum Entry Age:  18 years
+Maximum Entry Age:  60 years
+Renewability:       Lifetime, subject to policy terms
+
+---
+
+INCLUSIONS (WHAT IS COVERED)
+-----------------------------
+- Inpatient hospitalisation for illness or accidental injury (minimum 24-hour admission)
+- Pre- and post-hospitalisation expenses: 30 days before and 60 days after discharge
+- Day-care procedures listed in the approved schedule (112 procedures)
+- Ambulance charges: up to ₹1,500 per hospitalisation event
+- Organ donor expenses: up to ₹50,000 (donor's medical costs only)
+- AYUSH treatment (Ayurveda, Yoga, Unani, Siddha, Homeopathy): up to ₹20,000/year
+  at government-recognised hospitals only
+
+---
+
+EXCLUSIONS (WHAT IS NOT COVERED)
+----------------------------------
+- Pre-existing diseases (PED) during the first 4 years of continuous coverage
+- Any illness diagnosed within the first 30 days of policy inception (initial waiting period)
+- Specific diseases in Year 1 and Year 2: cataracts, hernia, joint replacement,
+  varicose veins, kidney stones, piles, fistula, sinusitis
+- Cosmetic or aesthetic surgery and treatments
+- Dental treatment (unless arising from accidental injury requiring hospitalisation)
+- Spectacles, contact lenses, hearing aids
+- Maternity and newborn expenses
+- Self-inflicted injuries, suicide attempts
+- War, nuclear, biological, or chemical hazard events
+- Experimental or unproven treatments
+- Obesity treatment and weight-loss surgery
+- Infertility and assisted reproduction
+
+---
+
+WAITING PERIODS
+---------------
+Initial Waiting Period:         30 days (all illnesses except accidents)
+Pre-existing Disease (PED):     4 years of continuous coverage
+Specific Disease Waiting Period: 2 years (listed conditions above)
+
+Note: The 4-year PED waiting period is the longest among comparable plans in this
+segment. Policyholders with diabetes, hypertension, or cardiac conditions should
+carefully evaluate this before purchasing.
+
+---
+
+CO-PAY
+------
+No co-pay for policyholders aged below 60.
+20% co-pay applies for policyholders aged 60 and above at the time of claim.
+
+---
+
+ROOM RENT SUB-LIMIT
+-------------------
+Room rent capped at ₹1,500 per day (single standard room).
+ICU charges capped at ₹3,000 per day.
+If a higher category room is chosen, proportionate deduction applies to all
+associated charges (surgeon fees, anaesthesia, etc.).
+
+---
+
+SUB-LIMITS ON SPECIFIC PROCEDURES
+-----------------------------------
+Cataract surgery:         ₹20,000 per eye
+Knee/hip replacement:     ₹80,000 per joint
+Dialysis (per session):   ₹1,500
+
+---
+
+CLAIM TYPE
+----------
+Cashless: Available at 4,200+ network hospitals across India.
+Reimbursement: Submit original bills within 15 days of discharge.
+
+---
+
+NETWORK HOSPITALS
+-----------------
+Primarily Tier-2 and Tier-3 city hospitals. Metro coverage is limited.
+Policyholders in metro cities may find fewer cashless options compared to
+mid-tier plans. Always verify network status before admission.
+
+---
+
+NO-CLAIM BONUS
+--------------
+5% increase in sum insured for each claim-free year, up to a maximum of 25%.
+Bonus is reset to base sum insured if a claim is made.
+
+---
+
+RENEWAL NOTE
+------------
+Premium increases at ages 36, 46, and 56. Policyholders are advised to review
+coverage adequacy at each renewal milestone, particularly if health conditions
+have changed.
+
+---
+
+SUITABILITY SUMMARY
+--------------------
+Best suited for:
+  - Young adults (18–30) with no pre-existing conditions seeking basic cover
+  - Residents of Tier-2 and Tier-3 cities where hospital costs are lower
+  - Individuals with annual income below ₹3 lakh who need affordable entry-level cover
+
+Not recommended for:
+  - Individuals with diabetes, hypertension, or other pre-existing conditions
+    (4-year waiting period is a significant gap in coverage)
+  - Metro city residents who require higher room rent limits
+  - Families needing maternity or OPD benefits
+
+---
+
+INSURER CONTACT
+---------------
+SafeGuard General Insurance Co. Ltd.
+Claims Helpline: 1800-XXX-XXXX (toll-free, 24x7)
+Email: claims@safeguardgeneral.in
+Website: www.safeguardgeneral.in

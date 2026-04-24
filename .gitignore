@@ -1,6 +1,29 @@
-backend/venv
+# Python
+backend/venv/
 backend/.env
-frontend/node_modules
-__pycache__
+__pycache__/
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+*.egg-info/
 
+# Database & vector store
+backend/aarogyaaid.db
+backend/chroma_db/
+backend/uploads/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,230 @@
+/* ============================================================
+   LandingPage.module.css — Public landing page
+   ============================================================ */
+
+.page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── Nav ── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 64px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-xs);
+}
+
+.logo {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: -0.2px;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navLink {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+  font-weight: 500;
+}
+
+.navLink:hover {
+  color: var(--color-text);
+  background: #F4F4F2;
+  text-decoration: none;
+}
+
+.navCta {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: #fff;
+  background: var(--color-primary);
+  text-decoration: none;
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  transition: background var(--transition);
+}
+
+.navCta:hover {
+  background: var(--color-primary-hover);
+  text-decoration: none;
+}
+
+/* ── Hero ── */
+.hero {
+  max-width: 640px;
+  margin: 88px auto 72px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: var(--text-hero);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+.heroSub {
+  font-size: var(--text-md);
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  margin-bottom: 36px;
+}
+
+.heroActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: 500;
+  padding: 13px 26px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background var(--transition), box-shadow var(--transition);
+  letter-spacing: 0.01em;
+}
+
+.primaryBtn:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 4px 12px rgba(59, 91, 219, 0.25);
+  text-decoration: none;
+}
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: 500;
+  padding: 13px 26px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.ghostBtn:hover {
+  border-color: #ABABAB;
+  background: #FAFAF9;
+  text-decoration: none;
+}
+
+/* ── Features ── */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto 88px;
+  padding: 0 24px;
+}
+
+.featureCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: left;
+  transition: box-shadow var(--transition), border-color var(--transition);
+}
+
+.featureCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #D8D8D8;
+}
+
+.featureTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.featureDesc {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
+/* ── Footer ── */
+.footer {
+  margin-top: auto;
+  padding: 24px 40px;
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-faint);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .nav {
+    padding: 0 20px;
+  }
+
+  .heroTitle {
+    font-size: var(--text-3xl);
+    letter-spacing: -1px;
+  }
+
+  .heroSub {
+    font-size: var(--text-base);
+  }
+
+  .hero {
+    margin: 56px auto 48px;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+    margin-bottom: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroTitle {
+    font-size: 28px;
+  }
+
+  .heroActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primaryBtn,
+  .ghostBtn {
+    justify-content: center;
+  }
+}

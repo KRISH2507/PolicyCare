@@ -1,0 +1,177 @@
+POLICY DOCUMENT
+===============
+Policy Name:   MedProtect Plus
+Insurer:       HealthFirst Insurance Ltd.
+Policy Type:   Individual & Family Floater Health Insurance
+Document Ref:  HF-MPP-2024-v2
+
+---
+
+OVERVIEW
+--------
+MedProtect Plus is a mid-segment comprehensive health insurance plan built for
+working professionals and families managing chronic conditions such as diabetes,
+hypertension, and asthma. It offers a shorter pre-existing disease waiting period
+than most comparable plans, making it the preferred choice for individuals who
+need meaningful coverage sooner.
+
+---
+
+PREMIUM & COVER
+---------------
+Individual Plan:
+  Annual Premium:  ₹12,000 (age 18–40) | ₹17,500 (age 41–55) | ₹24,000 (age 56–65)
+  Sum Insured:     ₹5,00,000 (Five Lakh Rupees)
+
+Family Floater (2 adults + 2 children):
+  Annual Premium:  ₹22,000 (primary insured age 18–40)
+  Sum Insured:     ₹7,00,000 (Seven Lakh Rupees, shared across family)
+
+Policy Term:       1 year, renewable annually
+Grace Period:      30 days from renewal due date
+
+---
+
+ELIGIBILITY
+-----------
+Minimum Entry Age:  91 days (children under floater) | 18 years (individual)
+Maximum Entry Age:  65 years
+Renewability:       Lifetime
+
+---
+
+INCLUSIONS (WHAT IS COVERED)
+-----------------------------
+- Inpatient hospitalisation for illness or accidental injury (minimum 24-hour admission)
+- Pre- and post-hospitalisation: 60 days before and 90 days after discharge
+- Day-care procedures: all 540 IRDAI-listed procedures covered
+- Ambulance charges: up to ₹3,000 per event (air ambulance: up to ₹1,00,000)
+- Organ donor expenses: up to ₹1,50,000
+- AYUSH treatment: up to ₹50,000/year at NABH-accredited facilities
+- Domiciliary hospitalisation: covered if hospital admission is not possible
+  (minimum 3 days of treatment at home)
+- Mental health treatment: inpatient psychiatric care covered (as per IRDAI mandate)
+- Diabetes management programme: annual HbA1c test, ophthalmology check, and
+  podiatry consultation covered under wellness benefit (up to ₹5,000/year)
+- Second medical opinion: one consultation per policy year at empanelled hospitals
+
+---
+
+PRE-EXISTING DISEASE (PED) COVERAGE — KEY DIFFERENTIATOR
+----------------------------------------------------------
+Diabetes (Type 1 and Type 2):     Covered after 2-year waiting period
+Hypertension:                     Covered after 2-year waiting period
+Asthma:                           Covered after 2-year waiting period
+Thyroid disorders:                Covered after 2-year waiting period
+Other PEDs (as declared):         Covered after 2-year waiting period
+
+This 2-year PED waiting period is significantly shorter than the industry standard
+of 3–4 years, making MedProtect Plus the recommended plan for individuals with
+declared chronic conditions.
+
+---
+
+EXCLUSIONS (WHAT IS NOT COVERED)
+----------------------------------
+- Any illness in the first 30 days of policy inception (initial waiting period)
+- Specific diseases in Year 1: cataracts, hernia, joint replacement, varicose veins
+- Cosmetic or aesthetic surgery
+- Dental treatment (unless due to accidental injury)
+- Spectacles, contact lenses, hearing aids
+- Maternity expenses (available as optional add-on rider at ₹3,500/year)
+- Self-inflicted injuries, substance abuse
+- War, nuclear, biological, or chemical hazard events
+- Experimental treatments not approved by ICMR or equivalent body
+- Obesity treatment and bariatric surgery (unless BMI > 40 with comorbidities,
+  subject to medical board approval)
+
+---
+
+WAITING PERIODS
+---------------
+Initial Waiting Period:          30 days (all illnesses except accidents)
+Pre-existing Diseases:           2 years (see PED section above)
+Specific Disease Waiting Period: 1 year (cataracts, hernia, joint replacement,
+                                  varicose veins)
+
+---
+
+CO-PAY
+------
+Metro cities (Mumbai, Delhi, Bengaluru, Chennai, Hyderabad, Kolkata, Pune):
+  10% co-pay on all claims above ₹50,000.
+
+Tier-2 cities: No co-pay.
+Tier-3 cities: No co-pay.
+
+Policyholders aged 60 and above: Additional 10% co-pay (cumulative with city co-pay
+where applicable, maximum 20%).
+
+---
+
+ROOM RENT
+---------
+Up to ₹4,000 per day (single AC room).
+ICU: Up to ₹8,000 per day.
+No proportionate deduction if room rent limit is not exceeded.
+
+---
+
+SUB-LIMITS
+----------
+Cataract surgery:         ₹40,000 per eye
+Knee/hip replacement:     ₹1,50,000 per joint
+Dialysis (per session):   ₹2,500
+Chemotherapy (per cycle): ₹50,000
+
+---
+
+CLAIM TYPE
+----------
+Cashless: Available at 8,500+ network hospitals across India, including major
+metro hospitals and specialty centres.
+Reimbursement: Submit original bills within 30 days of discharge.
+Claim settlement target: 95% of cashless claims pre-authorised within 2 hours.
+
+---
+
+WELLNESS BENEFITS
+-----------------
+- Annual health check-up: covered once per policy year (basic panel)
+- Diabetes management: HbA1c, eye check, foot check (up to ₹5,000/year)
+- Teleconsultation: unlimited consultations via empanelled telemedicine platform
+- Fitness tracker discount: 5% premium discount on renewal if 8,000 steps/day
+  average maintained (verified via linked app)
+
+---
+
+NO-CLAIM BONUS
+--------------
+10% increase in sum insured for each claim-free year, up to a maximum of 50%.
+Bonus is reduced by 10% (not reset) if a claim is made.
+
+---
+
+SUITABILITY SUMMARY
+--------------------
+Best suited for:
+  - Individuals aged 25–55 with declared pre-existing conditions (diabetes,
+    hypertension, asthma) who need coverage within 2 years
+  - Metro and Tier-2 city residents who need higher room rent limits
+  - Working professionals with ₹3–15 lakh annual income seeking comprehensive cover
+  - Families wanting a floater plan with chronic disease coverage
+
+Not recommended for:
+  - Individuals seeking the lowest possible premium (CareShield Basic is cheaper)
+  - Those needing maternity cover without purchasing the optional rider
+  - Policyholders above 65 (maximum entry age is 65)
+
+---
+
+INSURER CONTACT
+---------------
+HealthFirst Insurance Ltd.
+Claims Helpline: 1800-YYY-YYYY (toll-free, 24x7)
+Email: support@healthfirstinsurance.in
+Website: www.healthfirstinsurance.in
+TPA Partner: MediAssist Healthcare Services
